@@ -1,0 +1,35 @@
+defmodule CliTest do
+  use ExUnit.Case
+  doctest Issues
+
+  import Issues.CLI, only: [
+    parse_args: 1,
+    sort_into_ascending_order: 1,
+    convert_to_list_of_maps: 1
+  ]
+
+  test ":help return by option with -h and --help options" do
+    assert parse_args(["-h", "anything"]) == :help
+    assert parse_args(["--help", "anything"]) == :help
+  end
+
+  test "three values return if three are given" do
+    assert parse_args(["hello", "hi", "3"]) == {"hello", "hi", 3}
+  end
+
+  test "count is defaulted to 4 if 2 args are given" do
+    assert parse_args(["hello", "hi"]) == {"hello", "hi", 4}
+  end
+
+  test "sort ascending orders the correct way" do
+    result = sort_into_ascending_order(fake_created_at_list(["c", "a", "b"]))
+    issues = for issue <- result, do: issue["created_at"]
+    assert issues == ~w{ a b c }
+  end
+
+  defp fake_created_at_list(values) do
+    data = for value <- values,
+           do: [{"created_at", value}, {"order_data", "xxx"}]
+    convert_to_list_of_maps data
+  end
+end
