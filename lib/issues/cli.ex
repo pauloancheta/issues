@@ -1,4 +1,7 @@
 defmodule Issues.CLI do
+
+  import Issues.TableFormatter, only: [ print_table_for_columns: 2 ]
+
   @default_count 4
 
   @moduledoc """
@@ -40,19 +43,12 @@ defmodule Issues.CLI do
   end
 
   def process({user, project, count}) do
-    sorted_issues(user, project)
-    |> Enum.take(count)
-  end
-
-  def process({user, project, _count}) do
-    sorted_issues(user, project)
-  end
-
-  def sorted_issues(user, project) do
     Issues.GithubIssues.fetch(user, project)\
     |> decode_response
     |> convert_to_list_of_maps
     |> sort_into_ascending_order
+    |> Enum.take(count)
+    |> print_table_for_columns(["number", "title", "created_at"])
   end
 
   def decode_response({:ok, body}), do: body
