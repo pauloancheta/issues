@@ -10,7 +10,7 @@ defmodule Issues.CLI do
   a table of the las_n_issues ina github project
   """
 
-  def run(argv) do
+  def main(argv) do
     argv
     |> parse_args
     |> process
